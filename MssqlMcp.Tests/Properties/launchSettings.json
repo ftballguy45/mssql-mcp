@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MssqlMcp.Tests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CONNECTION_STRING": "(localdb)\\mssqllocaldb;Integrated Security=true;TrustServerCertificate=true;Encrypt=false;"
+      }
+    }
+  }
+}

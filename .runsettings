@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <!-- Update this connection string to match your SQL Server instance -->
+      <!-- Common options:
+           Local SQL Server: Server=.;Trusted_Connection=True;TrustServerCertificate=True
+           SQL Express: Server=.\SQLEXPRESS;Trusted_Connection=True;TrustServerCertificate=True
+           LocalDB: Server=(localdb)\mssqllocaldb;Integrated Security=true;TrustServerCertificate=true
+      -->
+        <CONNECTION_STRING>Server=(localdb)\mssqllocaldb;Integrated Security=true;TrustServerCertificate=true;Encrypt=false;</CONNECTION_STRING>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>
