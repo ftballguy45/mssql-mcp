@@ -9,6 +9,7 @@ This project is a .NET 8 console application implementing a Model Context Protoc
   - **Database Operations**:
     - CreateDatabase: Create new databases.
     - DropDatabase: Drop existing databases.
+    - ListDatabases: List all user databases on the SQL Server instance.
   - **Table Operations**:
     - ListTables: List all tables in a database.
     - DescribeTable: Get schema/details for a table.
@@ -25,7 +26,7 @@ This project is a .NET 8 console application implementing a Model Context Protoc
 
 ### Prerequisites
 
-- Access to a SQL Server
+- Access to a SQL Server or Azure SQL Database
 
 ### Setup
 
@@ -139,17 +140,19 @@ Add a new MCP Server with the following settings:
 
 **Important**: The connection string should NOT include a database name. Each tool operation will specify which database to use.
 
-Save the file, start a new Chat, you'll see the "Tools" icon, it should list 9 MSSQL MCP tools.
+Save the file, start a new Chat, you'll see the "Tools" icon, it should list 10 MSSQL MCP tools.
 
 ## Usage Notes
 
 ### Database Operations
 - **CreateDatabase**: Creates a new database on the SQL Server instance. The connection string's database is used for the initial connection, but operations are performed against the new database.
 - **DropDatabase**: Drops an existing database. Use with caution as this is a destructive operation.
+- **ListDatabases**: Lists all user databases on the SQL Server instance (excludes system databases: master, tempdb, model, msdb). Returns database name, ID, creation date, state, recovery model, and size in MB.
 
 ### Table and Data Operations
 - **All table and data operations require a database name parameter**. This allows you to work with multiple databases from a single MCP server instance.
 - Example prompts:
+  - "List all databases"
   - "List tables in database 'test'"
   - "Create a table named 'users' in database 'myapp'"
   - "Read data from table 'customers' in database 'sales'"
