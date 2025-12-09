@@ -5,6 +5,7 @@ This project is a .NET 8 console application implementing a Model Context Protoc
 ## Features
 
 - Provide connection string via environment variable `CONNECTION_STRING`.
+- **Dynamic Server Connection**: All tools accept an optional `server` parameter to connect to different SQL Server instances on-the-fly.
 - **MCP Tools Implemented**:
   - **Database Operations**:
     - CreateDatabase: Create new databases.
@@ -144,8 +145,19 @@ Save the file, start a new Chat, you'll see the "Tools" icon, it should list 10 
 
 ## Usage Notes
 
+### Dynamic Server Connection
+All tools accept an optional `server` parameter that allows you to connect to different SQL Server instances without changing the MCP server configuration:
+
+- **Default behavior**: If `server` is not provided, the tool uses the server from the `CONNECTION_STRING` environment variable.
+- **Override server**: Pass a `server` parameter to connect to a different SQL Server instance.
+
+Example prompts:
+- "List databases" (uses default server)
+- "List databases on server 'myserver.database.windows.net'" (connects to Azure SQL)
+- "List tables in database 'mydb' on server 'localhost\\SQLEXPRESS'" (connects to SQL Express)
+
 ### Database Operations
-- **CreateDatabase**: Creates a new database on the SQL Server instance. The connection string's database is used for the initial connection, but operations are performed against the new database.
+- **CreateDatabase**: Creates a new database on the SQL Server instance.
 - **DropDatabase**: Drops an existing database. Use with caution as this is a destructive operation.
 - **ListDatabases**: Lists all user databases on the SQL Server instance (excludes system databases: master, tempdb, model, msdb). Returns database name, ID, creation date, state, recovery model, and size in MB.
 
@@ -156,11 +168,13 @@ Save the file, start a new Chat, you'll see the "Tools" icon, it should list 10 
   - "List tables in database 'test'"
   - "Create a table named 'users' in database 'myapp'"
   - "Read data from table 'customers' in database 'sales'"
+  - "List tables in database 'test' on server 'myserver.database.windows.net'"
 
 ### Connection String
-- The connection string provided in the environment variable is used for server connection only.
+- The connection string provided in the environment variable is used as the default server connection.
 - **Do NOT include a database name** (`Initial Catalog` or `Database`) in the connection string.
 - Each tool operation specifies which database to use via a parameter.
+- You can override the server at runtime using the optional `server` parameter.
 - For database creation/deletion, the connection uses the master database.
 
 # Troubleshooting
@@ -169,6 +183,7 @@ Save the file, start a new Chat, you'll see the "Tools" icon, it should list 10 
 2. Ensure your SQL Server user has appropriate permissions for database creation if using CreateDatabase.
 3. When working with multiple databases, always specify the database name in your prompts to avoid confusion.
 4. Make sure your connection string does NOT include a database name - the MCP tools will handle database selection dynamically.
+5. When connecting to remote servers, ensure your firewall rules and authentication settings are properly configured.
 
 
 

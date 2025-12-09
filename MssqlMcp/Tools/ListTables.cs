@@ -17,9 +17,10 @@ public partial class Tools
         Destructive = false),
         Description("Lists all tables in the SQL Database.")]
     public async Task<DbOperationResult> ListTables(
-        [Description("Database name to execute query against")] string databaseName)
+        [Description("Database name to execute query against")] string databaseName,
+        [Description("Optional: SQL Server name/address to connect to (e.g., '.', 'localhost', 'server.database.windows.net'). If not provided, uses the default from CONNECTION_STRING.")] string? server = null)
     {
-        var conn = await _connectionFactory.GetOpenConnectionAsync(databaseName);
+        var conn = await _connectionFactory.GetOpenConnectionAsync(databaseName, server);
         try
         {
             using (conn)
