@@ -5,8 +5,11 @@ This project is a .NET 8 console application implementing a Model Context Protoc
 ## Features
 
 - Provide connection string via environment variable `CONNECTION_STRING`.
-- **Dynamic Server Connection**: All tools accept an optional `server` parameter to connect to different SQL Server instances on-the-fly.
-- **MCP Tools Implemented**:
+- **Dynamic Server Connection**: All tools accept optional connection parameters to connect to different SQL Server instances on-the-fly, including Azure SQL Database.
+- **Connection Help Tool**: Built-in tool to help discover what connection parameters are needed for different SQL Server types.
+- **MCP Tools Implemented (11 tools)**:
+  - **Connection Help**:
+    - GetConnectionHelp: Get guidance on connection parameters needed for different SQL Server types (local, named-instance, remote, azure-sql, azure-sql-mi).
   - **Database Operations**:
     - CreateDatabase: Create new databases.
     - DropDatabase: Drop existing databases.
@@ -141,20 +144,60 @@ Add a new MCP Server with the following settings:
 
 **Important**: The connection string should NOT include a database name. Each tool operation will specify which database to use.
 
-Save the file, start a new Chat, you'll see the "Tools" icon, it should list 10 MSSQL MCP tools.
+Save the file, start a new Chat, you'll see the "Tools" icon, it should list 11 MSSQL MCP tools.
 
 ## Usage Notes
 
+### Connection Help Tool
+Use the **Get Connection Help** tool to discover what connection parameters are needed for your specific SQL Server type:
+
+```
+"Get connection help for 'azure-sql'"
+"Get connection help for 'local'"
+"Get connection help for 'named-instance'"
+"Get connection help for 'remote'"
+```
+
+The tool will return:
+- Required parameters for that server type
+- Optional parameters
+- Example server format
+- Authentication options
+- Example prompts
+
 ### Dynamic Server Connection
-All tools accept an optional `server` parameter that allows you to connect to different SQL Server instances without changing the MCP server configuration:
+All tools accept optional connection parameters that allow you to connect to different SQL Server instances without changing the MCP server configuration:
 
-- **Default behavior**: If `server` is not provided, the tool uses the server from the `CONNECTION_STRING` environment variable.
-- **Override server**: Pass a `server` parameter to connect to a different SQL Server instance.
+| Parameter | Description |
+|-----------|-------------|
+| `server` | SQL Server name/address (e.g., `.`, `localhost`, `localhost\SQLEXPRESS`, `myserver.database.windows.net`) |
+| `userId` | SQL Server user ID for SQL authentication |
+| `password` | SQL Server password for SQL authentication |
+| `trustServerCertificate` | Trust the server certificate (useful for dev/test) |
+| `encrypt` | Encrypt the connection (required for Azure SQL) |
 
-Example prompts:
-- "List databases" (uses default server)
-- "List databases on server 'myserver.database.windows.net'" (connects to Azure SQL)
-- "List tables in database 'mydb' on server 'localhost\\SQLEXPRESS'" (connects to SQL Express)
+**Example prompts:**
+
+Local SQL Server (uses defaults):
+```
+"List databases"
+"List tables in database 'mydb'"
+```
+
+SQL Server Named Instance:
+```
+"List tables in database 'mydb' on server '.\\SQLEXPRESS'"
+```
+
+Remote SQL Server with SQL Authentication:
+```
+"List tables in database 'mydb' on server 'sqlserver.mycompany.com' with userId 'sa' and password 'MyPassword123'"
+```
+
+Azure SQL Database:
+```
+"List tables in database 'mydb' on server 'myserver.database.windows.net' with userId 'myadmin' and password 'MyPassword123' with encrypt true"
+```
 
 ### Database Operations
 - **CreateDatabase**: Creates a new database on the SQL Server instance.
@@ -174,7 +217,7 @@ Example prompts:
 - The connection string provided in the environment variable is used as the default server connection.
 - **Do NOT include a database name** (`Initial Catalog` or `Database`) in the connection string.
 - Each tool operation specifies which database to use via a parameter.
-- You can override the server at runtime using the optional `server` parameter.
+- You can override the server and authentication at runtime using the optional connection parameters.
 - For database creation/deletion, the connection uses the master database.
 
 # Troubleshooting
@@ -184,6 +227,11 @@ Example prompts:
 3. When working with multiple databases, always specify the database name in your prompts to avoid confusion.
 4. Make sure your connection string does NOT include a database name - the MCP tools will handle database selection dynamically.
 5. When connecting to remote servers, ensure your firewall rules and authentication settings are properly configured.
+6. For Azure SQL Database, ensure:
+   - Your IP address is allowed in the firewall rules
+   - You're using the correct server format: `<servername>.database.windows.net`
+   - You provide userId and password for SQL authentication
+7. Use the **Get Connection Help** tool to understand what parameters are needed for your specific server type.
 
 
 

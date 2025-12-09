@@ -6,13 +6,19 @@ public class SqlConnectionFactory : ISqlConnectionFactory
 {
     public async Task<SqlConnection> GetOpenConnectionAsync(string databaseName)
     {
-        return await GetOpenConnectionAsync(databaseName, null, null);
+        return await GetOpenConnectionAsync(databaseName, null, null, null, null, null, null);
     }
 
-    public async Task<SqlConnection> GetOpenConnectionAsync(string databaseName, string? server, bool? useWindowsAuth = null)
+    public async Task<SqlConnection> GetOpenConnectionAsync(
+        string databaseName, 
+        string? server = null, 
+        string? userId = null, 
+        string? password = null,
+        bool? useWindowsAuth = null,
+        bool? trustServerCertificate = null,
+        bool? encrypt = null)
     {
         var connectionString = GetConnectionString();
-
         var sqb = new SqlConnectionStringBuilder(connectionString);
         
         // Override database
@@ -24,18 +30,32 @@ public class SqlConnectionFactory : ISqlConnectionFactory
             sqb.DataSource = server;
         }
         
-        // Override authentication if specified
-        if (useWindowsAuth.HasValue)
+        // Handle authentication
+        if (!string.IsNullOrWhiteSpace(userId) && !string.IsNullOrWhiteSpace(password))
         {
-            if (useWindowsAuth.Value)
-            {
-                sqb.IntegratedSecurity = true;
-                sqb.Authentication = SqlAuthenticationMethod.NotSpecified;
-            }
-            else
-            {
-                sqb.IntegratedSecurity = false;
-            }
+            // SQL Server authentication
+            sqb.UserID = userId;
+            sqb.Password = password;
+            sqb.IntegratedSecurity = false;
+            sqb.Authentication = SqlAuthenticationMethod.SqlPassword;
+        }
+        else if (useWindowsAuth == true)
+        {
+            // Windows/Integrated authentication
+            sqb.IntegratedSecurity = true;
+            sqb.Authentication = SqlAuthenticationMethod.NotSpecified;
+        }
+        
+        // Override trust server certificate if specified
+        if (trustServerCertificate.HasValue)
+        {
+            sqb.TrustServerCertificate = trustServerCertificate.Value;
+        }
+        
+        // Override encryption if specified
+        if (encrypt.HasValue)
+        {
+            sqb.Encrypt = encrypt.Value ? SqlConnectionEncryptOption.Mandatory : SqlConnectionEncryptOption.Optional;
         }
 
         var conn = new SqlConnection(sqb.ToString());
